@@ -5,23 +5,14 @@ const { Product, Category, Tag, ProductTag } = require('../../models');
 // The `/api/products` endpoint
 
 // get all products
+
 router.get('/', async (req, res) => {
   // find all products
   try {
-    const productData = await Product.findAll({ attributes: [
-      'id',
-      'product_name',
-      'price',
-      'stock',
-      'category_id',
-      'created_at',
-    ],
-    order: [
-      ['created_at', 'DESC']
-    ],
-      include: [
-      { model: Category, attributes: ['id', 'category_name']}, 
-      { model: Tag, attributes: ['id', 'tag_name'] }],
+    const productData = await Product.findAll({ 
+    
+      include: [ Category, { model: Tag, through: ProductTag }]
+      
     });
     res.status(200).json(productData);
   } catch (err) {
@@ -35,7 +26,8 @@ router.get('/:id', async (req, res) => {
   // find a single product by its `id`
   try {
     const productData = await Product.findByPk(req.params.id, {
-      include: [{ model: Category }, { model: Tag }],
+      include: [Category, { model: Tag, through: ProductTag }],
+      // [{ model: Category }, { model: Tag }],
     });
 
     if (!productData) {
@@ -140,3 +132,6 @@ router.delete('/:id', async (req, res) => {
 });
 
 module.exports = router;
+
+
+// -----------------------------------
